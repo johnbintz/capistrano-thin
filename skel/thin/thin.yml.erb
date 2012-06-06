@@ -1,0 +1,15 @@
+pid: <%= thin_pid %>
+address: 127.0.0.1
+timeout: 30
+wait: 30
+port: <%= thin_port %>
+log: <%= thin_log %>
+max_conns: <%= thin_max_conns %>
+require: []
+
+environment: <%= retrieve_env %>
+max_persistent_conns: <%= thin_max_persistent_conns %>
+servers: <%= thin_servers %>
+daemonize: true
+chdir: <%= current_path %>
+

@@ -1,0 +1,14 @@
+God.watch do |w|
+  w.name = "<%= application %>-thin"
+  w.interval = 30.seconds
+
+  pid = "<%= thin_pid %>"
+
+  template = 'bash -c "cd <%= current_dir %> && RAILS_ENV=<%= retrieve_env %> <%= thin_command %> <%= thin_config %> %s"'
+
+  w.start = template % [ 'start' ]
+  w.stop = template % [ 'stop' ]
+
+  w.pid_file = pid
+end
+
