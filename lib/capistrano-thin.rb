@@ -1,21 +1,21 @@
 require 'erb'
 
 Capistrano::Configuration.instance.load do
-  def self.cset(variable, *args, &block)
+  def _cset(variable, *args, &block)
     set(variable, *args, &block) if !exists?(variable)
   end
 
-  cset(:thin_command) { 'bundle exec thin' }
-  cset(:thin_config_file) { "#{current_path}/thin.yml" }
-  cset(:thin_config) { "-C #{thin_config_file}" }
+  _cset(:thin_command) { 'bundle exec thin' }
+  _cset(:thin_config_file) { "#{current_path}/thin.yml" }
+  _cset(:thin_config) { "-C #{thin_config_file}" }
 
-  cset(:thin_port) { 3000 }
-  cset(:thin_pid) { 'tmp/pids/thin.pid' }
-  cset(:thin_log) { 'log/thin.log' }
-  cset(:thin_max_conns) { 1024 }
-  cset(:thin_max_persistent_conns) { 512 }
+  _cset(:thin_port) { 3000 }
+  _cset(:thin_pid) { 'tmp/pids/thin.pid' }
+  _cset(:thin_log) { 'log/thin.log' }
+  _cset(:thin_max_conns) { 1024 }
+  _cset(:thin_max_persistent_conns) { 512 }
 
-  cset(:thin_servers) { 4 }
+  _cset(:thin_servers) { 4 }
 
   namespace :deploy do
     task :start do
@@ -27,6 +27,8 @@ Capistrano::Configuration.instance.load do
     end
 
     task :restart do
+      top.thin.config
+
       run "cd #{current_path} && #{thin_command} #{thin_config} -O restart"
     end
   end
@@ -64,8 +66,9 @@ Capistrano::Configuration.instance.load do
     end
   end
 
-  after 'deploy:setup', 'thin:god', 'thin:config', 'thin:shared_pids'
+  after 'deploy:setup', 'thin:god', 'thin:shared_pids'
 
+  before 'deploy:restart', 'thin:config'
   after 'deploy:symlink', 'thin:rolling_restart'
 end
 
